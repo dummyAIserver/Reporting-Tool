@@ -28,29 +28,32 @@
             overflow: hidden;
         }
 
-        /* TOAST DESIGN */
-        #toast {
+        /* --- NEW TOAST STYLE --- */
+        #toast-container {
             visibility: hidden;
-            min-width: 200px;
-            background-color: #1a1a1a;
-            color: #fff;
-            text-align: center;
-            border-radius: 12px;
-            padding: 16px;
             position: fixed;
-            z-index: 100;
-            top: 30px;
-            font-size: 14px;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
             border: 1px solid var(--accent-purple);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5), 0 0 10px var(--accent-glow);
-            transition: 0.5s ease;
+            box-shadow: 0 0 20px var(--accent-glow);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            z-index: 1000;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             opacity: 0;
+            transition: opacity 0.4s, top 0.4s;
         }
 
-        #toast.show {
+        #toast-container.show {
             visibility: visible;
             opacity: 1;
-            top: 50px;
+            top: 40px;
         }
 
         .container {
@@ -63,6 +66,7 @@
             box-shadow: 0 0 40px rgba(0,0,0,0.8);
             text-align: center;
             position: relative;
+            overflow: hidden;
         }
 
         h1 {
@@ -74,7 +78,16 @@
             -webkit-text-fill-color: transparent;
         }
 
-        p.subtitle { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 2rem; }
+        p.subtitle {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
 
         input {
             width: 100%;
@@ -84,8 +97,14 @@
             border: 1px solid #262626;
             border-radius: 10px;
             color: white;
+            font-size: 0.9rem;
             outline: none;
-            margin-bottom: 1.5rem;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
         button {
@@ -97,86 +116,174 @@
             color: white;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
             box-shadow: 0 4px 15px var(--accent-glow);
         }
 
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Processing View */
         #status-box { display: none; margin-top: 1rem; }
+
         .loader-ring {
-            width: 40px; height: 40px;
-            border: 3px solid #161616; border-top: 3px solid var(--accent-purple);
-            border-radius: 50%; margin: 0 auto 20px;
+            width: 50px;
+            height: 50px;
+            border: 3px solid #161616;
+            border-top: 3px solid var(--accent-purple);
+            border-radius: 50%;
+            margin: 0 auto 20px;
             animation: spin 0.8s linear infinite;
         }
 
-        .progress-container { background: #161616; height: 6px; border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
-        .progress-bar { height: 100%; width: 0%; background: var(--accent-purple); transition: width 0.4s; }
+        .progress-container {
+            background: #161616;
+            height: 6px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
 
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #8b5cf6, #d8b4fe);
+            box-shadow: 0 0 10px var(--accent-purple);
+            transition: width 0.4s ease;
+        }
+
+        #log-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            min-height: 20px;
+        }
+
+        /* Error Design */
         .error-card {
-            display: none; margin-top: 20px; background: rgba(255, 77, 77, 0.05);
-            border: 1px solid rgba(255, 77, 77, 0.2); border-radius: 10px;
-            padding: 15px; color: var(--error-red); font-size: 0.85rem; text-align: left;
+            display: none;
+            margin-top: 20px;
+            background: rgba(255, 77, 77, 0.05);
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            color: var(--error-red);
+            font-size: 0.85rem;
+            text-align: left;
         }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
     </style>
 </head>
 <body>
 
-<div id="toast">⚠️ Please enter a valid link!</div>
+<div id="toast-container">
+    <span id="toast-icon">⚠️</span>
+    <span id="toast-message">Enter link!</span>
+</div>
 
 <div class="container" id="tool-ui">
     <h1>Reporting Tool</h1>
     <p class="subtitle">Enter target URL to begin automation</p>
 
     <div id="setup-view">
-        <input type="text" id="target" placeholder="https://instagram.com/target_user">
+        <div class="input-group">
+            <input type="text" id="target" placeholder="https://instagram.com/user_target">
+        </div>
         <button onclick="execute()">Start Divine Report</button>
     </div>
 
     <div id="status-box">
         <div class="loader-ring"></div>
-        <div class="progress-container"><div class="progress-bar" id="bar"></div></div>
-        <div id="log-text" style="font-size: 0.75rem; color: var(--accent-purple);">Connecting...</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="bar"></div>
+        </div>
+        <div id="log-text">Initializing divine-core...</div>
     </div>
 
     <div id="error-view" class="error-card">
-        <strong>⚠️ CRITICAL_SYSTEM_FAILURE</strong><br>
+        <strong style="display:block; margin-bottom: 5px;">⚠️ CRITICAL_SYSTEM_FAILURE</strong>
         Reason: Insufficient System Resources.<br>
-        Memory Leak detected at block 0x882.
+        Memory Leak detected at block 0x882.<br>
+        <span style="color:var(--text-dim); font-size: 10px; margin-top: 10px; display: block;">Hardware: Low RAM/CPU cycles available for decryption.</span>
     </div>
 </div>
 
 <script>
-    function showToast(msg) {
-        const toast = document.getElementById("toast");
-        toast.innerText = msg;
-        toast.className = "show";
-        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    // TOAST FUNCTION
+    function triggerToast(msg) {
+        const toast = document.getElementById("toast-container");
+        document.getElementById("toast-message").innerText = msg;
+        toast.classList.add("show");
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 3000);
     }
 
     function execute() {
         const target = document.getElementById('target').value;
         if(!target) {
-            showToast("⚠️ Link is required to start!");
+            triggerToast("Please enter a link first!");
             return;
         }
 
         document.getElementById('setup-view').style.display = 'none';
         document.getElementById('status-box').style.display = 'block';
 
+        // Full Log List as requested
+        const logs = [
+            "Fetching Divine Proxies...",
+            "Establishing SSL Handshake...",
+            "Encrypting Session Packets...",
+            "Injecting Reporting Headers...",
+            "Bypassing Rate Limits (Node-4)...",
+            "Validating Target Metadata...",
+            "Decrypting Instagram API Response...",
+            "Finalizing Payload Delivery...",
+            "Optimizing System Buffer..."
+        ];
+
         let p = 0;
+        let lIndex = 0;
         const bar = document.getElementById('bar');
+        const log = document.getElementById('log-text');
+
         const timer = setInterval(() => {
-            p += Math.floor(Math.random() * 5) + 2;
-            bar.style.width = p + "%";
-            if(p >= 45) {
+            p += Math.floor(Math.random() * 6) + 2;
+            
+            if(p >= 48) { 
                 clearInterval(timer);
-                setTimeout(() => {
-                    document.getElementById('status-box').style.display = 'none';
-                    document.getElementById('error-view').style.display = 'block';
-                }, 500);
+                crash();
+                return;
             }
-        }, 400);
+
+            bar.style.width = p + "%";
+            
+            // Logic for detailed logs
+            if(p > (lIndex + 1) * 5 && lIndex < logs.length) {
+                log.innerText = logs[lIndex];
+                lIndex++;
+            }
+        }, 450);
+    }
+
+    function crash() {
+        document.getElementById('status-box').style.opacity = '0.3';
+        document.getElementById('tool-ui').style.animation = 'shake 0.1s ease-in-out 0s 5';
+        
+        setTimeout(() => {
+            document.getElementById('status-box').style.display = 'none';
+            document.getElementById('error-view').style.display = 'block';
+            triggerToast("Error: Process Terminated!");
+        }, 600);
     }
 </script>
 
