@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divine Reporting Tool</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: #0d0d0d;
+            --accent-purple: #8b5cf6;
+            --accent-glow: rgba(139, 92, 246, 0.3);
+            --text-main: #ffffff;
+            --text-dim: #9ca3af;
+            --error-red: #ff4d4d;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: radial-gradient(circle at top center, #1e1b4b 0%, #050505 100%);
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #1f1f1f;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* DivineScan Style Header */
+        h1 {
+            font-size: 1.8rem;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to bottom right, #fff 30%, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            box-sizing: border-box;
+            background: #161616;
+            border: 1px solid #262626;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            background: var(--accent-purple);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Processing View */
+        #status-box { display: none; margin-top: 1rem; }
+
+        .loader-ring {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #161616;
+            border-top: 3px solid var(--accent-purple);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .progress-container {
+            background: #161616;
+            height: 6px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #8b5cf6, #d8b4fe);
+            box-shadow: 0 0 10px var(--accent-purple);
+            transition: width 0.4s ease;
+        }
+
+        #log-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            min-height: 20px;
+        }
+
+        /* Error Design */
+        .error-card {
+            display: none;
+            margin-top: 20px;
+            background: rgba(255, 77, 77, 0.05);
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            color: var(--error-red);
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="tool-ui">
+    <h1>Reporting Tool</h1>
+    <p class="subtitle">Enter target URL to begin automation</p>
+
+    <div id="setup-view">
+        <div class="input-group">
+            <input type="text" id="target" placeholder="https://instagram.com/user_target">
+        </div>
+        <button onclick="execute()">Start Divine Report</button>
+    </div>
+
+    <div id="status-box">
+        <div class="loader-ring"></div>
+        <div class="progress-container">
+            <div class="progress-bar" id="bar"></div>
+        </div>
+        <div id="log-text">Initializing divine-core...</div>
+    </div>
+
+    <div id="error-view" class="error-card">
+        <strong style="display:block; margin-bottom: 5px;">⚠️ CRITICAL_SYSTEM_FAILURE</strong>
+        Reason: Insufficient System Resources.<br>
+        Memory Leak detected at block 0x882.<br>
+        <span style="color:var(--text-dim); font-size: 10px; margin-top: 10px; display: block;">Hardware: Low RAM/CPU cycles available for decryption.</span>
+    </div>
+</div>
+
+<script>
+    function execute() {
+        const target = document.getElementById('target').value;
+        if(!target) return alert("Enter link!");
+
+        document.getElementById('setup-view').style.display = 'none';
+        document.getElementById('status-box').style.display = 'block';
+
+        const logs = [
+            "Fetching Divine Proxies...",
+            "Encrypting Session...",
+            "Injecting Report Packets...",
+            "Handshaking with API nodes...",
+            "Analyzing target vulnerabilities..."
+        ];
+
+        let p = 0;
+        let lIndex = 0;
+        const bar = document.getElementById('bar');
+        const log = document.getElementById('log-text');
+
+        const timer = setInterval(() => {
+            p += Math.floor(Math.random() * 7) + 2;
+            
+            if(p >= 48) { // Crash point
+                clearInterval(timer);
+                crash();
+                return;
+            }
+
+            bar.style.width = p + "%";
+            if(p > (lIndex + 1) * 10 && lIndex < logs.length) {
+                log.innerText = logs[lIndex];
+                lIndex++;
+            }
+        }, 450);
+    }
+
+    function crash() {
+        document.getElementById('status-box').style.opacity = '0.3';
+        document.getElementById('tool-ui').style.animation = 'shake 0.1s ease-in-out 0s 5';
+        
+        setTimeout(() => {
+            document.getElementById('status-box').style.display = 'none';
+            document.getElementById('error-view').style.display = 'block';
+        }, 600);
+    }
+</script>
+
+</body>
+</html>
